@@ -14,10 +14,10 @@ def clean_cookies(latest_file):
             os.remove(file_path)
 
 # 🔹 Upload command
-@bot.on_message(filters.command("cookies") & filters.private)
+@bot.on_message(filters.command("coupdate") & filters.private)
 async def upload_cookie(client, message):
     if not message.reply_to_message or not message.reply_to_message.document:
-        await message.reply("❌ Please reply to a TXT file with `/upload`.")
+        await message.reply("❌ Please reply to a TXT file with `/coupload`.")
         return
 
     file_path = os.path.join(COOKIE_DIR, "cookie.txt")
