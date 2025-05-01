@@ -1,66 +1,63 @@
 from pyrogram import enums, filters
 from Oneforall import app
 
-INFO_TEXT = """**
-❅─────✧❅✦❅✧─────❅
-✦ ᴜsᴇʀ ɪɴғᴏ ✦
+INFO_TEXT = """
+<b>❅─────✧❅✦❅✧─────❅</b>
+<b>✦ USER INFO ✦</b>
 
-➻ ᴜsᴇʀ ɪᴅ ‣ **`{}`
-**➻ ғɪʀsᴛ ɴᴀᴍᴇ ‣ **{}
-**➻ ʟᴀsᴛ ɴᴀᴍᴇ ‣ **{}
-**➻ ᴜsᴇʀɴᴀᴍᴇ ‣ **`{}`
-**➻ ᴍᴇɴᴛɪᴏɴ ‣ **{}
-**➻ ʟᴀsᴛ sᴇᴇɴ ‣ **{}
-**➻ ᴅᴄ ɪᴅ ‣ **{}
-**➻ ʙɪᴏ ‣ **{}
+➻ <b>USER ID:</b> <code>{}</code>
+➻ <b>FIRST NAME:</b> {}
+➻ <b>LAST NAME:</b> {}
+➻ <b>USERNAME:</b> <code>{}</code>
+➻ <b>MENTION:</b> {}
+➻ <b>LAST SEEN:</b> {}
+➻ <b>DC ID:</b> {}
+➻ <b>BIO:</b> <code>{}</code>
 
-❅─────✧❅✦❅✧─────❅
+<b>❅─────✧❅✦❅✧─────❅</b>
 """
 
 async def userstatus(user_id):
     try:
         user = await app.get_users(user_id)
-        x = user.status
-        if x == enums.UserStatus.RECENTLY:
-            return "Recently."
-        elif x == enums.UserStatus.LAST_WEEK:
-            return "Last week."
-        elif x == enums.UserStatus.LONG_AGO:
-            return "Long time ago."
-        elif x == enums.UserStatus.OFFLINE:
-            return "Offline."
-        elif x == enums.UserStatus.ONLINE:
-            return "Online."
+        status = user.status
+        return {
+            enums.UserStatus.RECENTLY: "Recently",
+            enums.UserStatus.LAST_WEEK: "Last week",
+            enums.UserStatus.LONG_AGO: "Long time ago",
+            enums.UserStatus.OFFLINE: "Offline",
+            enums.UserStatus.ONLINE: "Online"
+        }.get(status, "Unknown")
     except:
-        return "Unknown"
+        return "Something went wrong!"
 
-@app.on_message(
-    filters.command(["info", "userinfo"], prefixes=["/", ".", "!", "#", "@", ",", "%", ""])
-)
+@app.on_message(filters.command(["info", "userinfo"], prefixes=["/", "!", ".", "#"]))
 async def userinfo(_, message):
-    user_id = message.from_user.id
-
-    if message.reply_to_message:
-        user_id = message.reply_to_message.from_user.id
-    elif len(message.command) == 2:
-        user_id = message.text.split(None, 1)[1]
-
     try:
-        user_info = await app.get_chat(user_id)
-        user = await app.get_users(user_id)
-        status = await userstatus(user.id)
+        user = None
+        if message.reply_to_message:
+            user = message.reply_to_message.from_user
+        elif len(message.command) == 2:
+            user = await app.get_users(message.command[1])
+        else:
+            user = message.from_user
 
-        id = user_info.id
-        dc_id = user.dc_id or "Unknown"
-        first_name = user_info.first_name
-        last_name = user_info.last_name or "No last name"
-        username = user_info.username or "No username"
+        user_info = await app.get_chat(user.id)
+        status = await userstatus(user.id)
+        id = user.id
+        dc_id = user.dc_id
+        first_name = user.first_name or "No first name"
+        last_name = user.last_name or "No last name"
+        username = user.username or "No username"
         mention = user.mention
         bio = user_info.bio or "No bio set"
 
-        await message.reply_text(
+        msg = await message.reply_text(
             INFO_TEXT.format(id, first_name, last_name, username, mention, status, dc_id, bio),
-            parse_mode="markdown"
+            parse_mode="HTML"
         )
+
+        await asyncio.sleep(20)
+        await msg.delete()
     except Exception as e:
-        await message.reply_text(str(e))
+        await message.reply_text(f"<b>Error:</b> <code>{str(e)}</code>", parse_mode="HTML")
