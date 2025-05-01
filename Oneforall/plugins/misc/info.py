@@ -54,10 +54,10 @@ async def userinfo(_, message):
 
         msg = await message.reply_text(
             INFO_TEXT.format(id, first_name, last_name, username, mention, status, dc_id, bio),
-            parse_mode="HTML"
+            parse_mode="html"
         )
 
         await asyncio.sleep(20)
         await msg.delete()
     except Exception as e:
-        await message.reply_text(f"<b>Error:</b> <code>{str(e)}</code>", parse_mode="HTML")
+        await message.reply_text(f"<b>Error:</b> <code>{str(e)}</code>", parse_mode="html")
