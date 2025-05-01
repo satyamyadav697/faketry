@@ -1,9 +1,9 @@
-from pyrogram import Client, filters, enums
+from pyrogram import enums, filters
 from Oneforall import app
 
 INFO_TEXT = """**
 ❅─────✧❅✦❅✧─────❅
-            ✦ ᴜsᴇʀ ɪɴғᴏ ✦
+✦ ᴜsᴇʀ ɪɴғᴏ ✦
 
 ➻ ᴜsᴇʀ ɪᴅ ‣ **`{}`
 **➻ ғɪʀsᴛ ɴᴀᴍᴇ ‣ **{}
@@ -12,46 +12,55 @@ INFO_TEXT = """**
 **➻ ᴍᴇɴᴛɪᴏɴ ‣ **{}
 **➻ ʟᴀsᴛ sᴇᴇɴ ‣ **{}
 **➻ ᴅᴄ ɪᴅ ‣ **{}
-**➻ ʙɪᴏ ‣ **`{}`
+**➻ ʙɪᴏ ‣ **{}
 
-**❅─────✧❅✦❅✧─────❅**
+❅─────✧❅✦❅✧─────❅
 """
 
-async def userstatus(user):
+async def userstatus(user_id):
     try:
-        if user.status == enums.UserStatus.RECENTLY:
-            return "Recently"
-        elif user.status == enums.UserStatus.LAST_WEEK:
-            return "Last week"
-        elif user.status == enums.UserStatus.LONG_AGO:
-            return "Long time ago"
-        elif user.status == enums.UserStatus.OFFLINE:
-            return "Offline"
-        elif user.status == enums.UserStatus.ONLINE:
-            return "Online"
-        else:
-            return "Unknown"
+        user = await app.get_users(user_id)
+        x = user.status
+        if x == enums.UserStatus.RECENTLY:
+            return "Recently."
+        elif x == enums.UserStatus.LAST_WEEK:
+            return "Last week."
+        elif x == enums.UserStatus.LONG_AGO:
+            return "Long time ago."
+        elif x == enums.UserStatus.OFFLINE:
+            return "Offline."
+        elif x == enums.UserStatus.ONLINE:
+            return "Online."
     except:
-        return "Couldn't fetch"
+        return "Unknown"
 
-@app.on_message(filters.command(["info", "userinfo"]))
-async def userinfo(client, message):
+@app.on_message(
+    filters.command(["info", "userinfo"], prefixes=["/", ".", "!", "#", "@", ",", "%", ""])
+)
+async def userinfo(_, message):
+    user_id = message.from_user.id
+
     if message.reply_to_message:
-        user = message.reply_to_message.from_user
-    else:
-        user = message.from_user
+        user_id = message.reply_to_message.from_user.id
+    elif len(message.command) == 2:
+        user_id = message.text.split(None, 1)[1]
 
-    user_info = await client.get_chat(user.id)
-    status = await userstatus(user)
+    try:
+        user_info = await app.get_chat(user_id)
+        user = await app.get_users(user_id)
+        status = await userstatus(user.id)
 
-    user_id = user_info.id
-    first_name = user_info.first_name
-    last_name = user_info.last_name or "No last name"
-    username = user_info.username or "No username"
-    mention = user.mention
-    dc_id = user_info.dc_id or "Unknown"
-    bio = user_info.bio or "No bio set"
+        id = user_info.id
+        dc_id = user.dc_id or "Unknown"
+        first_name = user_info.first_name
+        last_name = user_info.last_name or "No last name"
+        username = user_info.username or "No username"
+        mention = user.mention
+        bio = user_info.bio or "No bio set"
 
-    text = INFO_TEXT.format(user_id, first_name, last_name, username, mention, status, dc_id, bio)
-
-    await message.reply(text, parse_mode="markdown")
+        await message.reply_text(
+            INFO_TEXT.format(id, first_name, last_name, username, mention, status, dc_id, bio),
+            parse_mode="markdown"
+        )
+    except Exception as e:
+        await message.reply_text(str(e))
