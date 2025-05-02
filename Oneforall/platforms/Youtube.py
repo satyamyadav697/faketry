@@ -15,18 +15,23 @@ from Oneforall.utils.database import is_on_off
 from Oneforall.utils.formatters import time_to_seconds
 
 
-def cookie_txt_file():
-    folder_path = f"{os.getcwd()}/cookies"
-    filename = f"{os.getcwd()}/cookies/logs.csv"
-    txt_files = glob.glob(os.path.join(folder_path, "*.txt"))
-    if not txt_files:
-        raise FileNotFoundError("No .txt files found in the specified folder.")
-    cookie_txt_file = random.choice(txt_files)
-    with open(filename, "a") as file:
-        file.write(f"Choosen File : {cookie_txt_file}\n")
-    return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
+def cookies():
+    url = "https://v0-mongo-db-api-setup.vercel.app/api/cookies.txt"
+    filename = "cookies.txt"
 
+    # Agar file already exist karti hai to usse delete karo
+    if os.path.exists(filename):
+        os.remove(filename)
 
+    # File ko URL se download karo
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(response.text)
+        return filename
+    else:
+        raise Exception("Failed to fetch cookies from URL")
+        
 async def check_file_size(link):
     async def get_format_info(link):
         proc = await asyncio.create_subprocess_exec(
