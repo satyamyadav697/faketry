@@ -4,7 +4,9 @@ import json
 import os
 import random
 import re
+import requests
 from typing import Union
+
 
 import yt_dlp
 from pyrogram.enums import MessageEntityType
