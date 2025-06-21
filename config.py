@@ -27,7 +27,7 @@ LOGGER_ID = int(getenv("LOGGER_ID", None))
 # Get this value from @BRANDRD_ROBOT on Telegram by /id
 OWNER_ID = int(getenv("OWNER_ID", "7323563554"))
 
-OWNER_USERNAME = getenv("OWNER_USERNAME","@AuraAnonymous")
+OWNER_USERNAME = getenv("OWNER_USERNAME","Yadavperson")
 
 ## Fill these variables if you're deploying on heroku.
 # Your heroku app name
@@ -93,8 +93,8 @@ autoclean = []
 confirmer = {}
 
 
-START_IMG_URL = getenv("START_IMG_URL", "https://graph.org/file/81d88b42e59908d05a859-7e00f77fc6ae3564a0.jpg")
-PING_IMG_URL = getenv("PING_IMG_URL", "https://graph.org/file/81d88b42e59908d05a859-7e00f77fc6ae3564a0.jpg")
+START_IMG_URL = getenv("START_IMG_URL", "https://files.catbox.moe/r76243.jpg")
+PING_IMG_URL = getenv("PING_IMG_URL", "https://files.catbox.moe/r76243.jpg")
 PLAYLIST_IMG_URL = "https://files.catbox.moe/ka4lzo.jpg"
 STATS_IMG_URL = "https://graph.org/file/81d88b42e59908d05a859-7e00f77fc6ae3564a0.jpg"
 TELEGRAM_AUDIO_URL = "https://files.catbox.moe/ka4lzo.jpg"
